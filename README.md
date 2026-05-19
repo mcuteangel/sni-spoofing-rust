@@ -17,6 +17,7 @@ A TCP forwarder that injects a fake TLS ClientHello with an intentionally wrong 
 - **Linux** -- AF_PACKET raw sockets. Requires root or `CAP_NET_RAW`.
 - **macOS** -- BPF device. Requires root.
 - **Windows** -- WinDivert driver. Requires Administrator.
+- **Android** -- AF_PACKET raw sockets. Requires root device. See [Android Setup](#android-setup-with-termux) for details.
 
 ## Build
 
@@ -153,8 +154,83 @@ To build cross-platform binaries for all supported platforms, use the included M
 make all
 ```
 
-This will create binaries for Linux (x64/ARM64), macOS (x64/ARM64), and Windows (x64) in the bins/ directory. Individual platform targets are also available: make linux-x64, make macos-arm64, etc.
+This will create binaries for Linux (x64/ARM64), macOS (x64/ARM64), Windows (x64), and Android (ARM64/ARM) in the bins/ directory. Individual platform targets are also available: make linux-x64, make macos-arm64, make android-arm64, etc.
 
+### Android Build
+
+Android binaries can be built using GitHub Actions or locally with Android NDK:
+
+**Using GitHub Actions (Recommended):**
+1. Push changes to trigger the `android-build` workflow
+2. Download artifacts from the Actions page
+3. Transfer to your device
+
+**Building Locally:**
+```bash
+rustup target add aarch64-linux-android armv7-linux-androideabi
+cargo build --release --target aarch64-linux-android  # for ARM64 devices
+cargo build --release --target armv7-linux-androideabi  # for ARM devices
+```
+
+### Android Setup with Termux
+
+**Requirements:**
+- Rooted Android device
+- Termux app (from F-Droid or GitHub)
+- Root access in Termux (`tsu` package)
+
+**Installation:**
+
+1. Install Termux and grant storage permissions:
+```bash
+termux-setup-storage
+```
+
+2. Install required packages:
+```bash
+pkg update
+pkg install tsu wget
+```
+
+3. Download the appropriate binary for your device architecture:
+```bash
+# Check your device architecture
+uname -m
+
+# Download ARM64 (most modern devices)
+wget https://github.com/YOUR_USERNAME/sni-spoofing-rust/releases/latest/download/sni-spoof-rs-android-arm64 -O sni-spoof-rs
+
+# Or ARM (older devices)
+wget https://github.com/YOUR_USERNAME/sni-spoofing-rust/releases/latest/download/sni-spoof-rs-android-arm -O sni-spoof-rs
+```
+
+4. Make executable:
+```bash
+chmod +x sni-spoof-rs
+```
+
+5. Create config.json (same as Linux setup):
+```json
+{
+  "graceful_shutdown_sec": 0,
+  "listeners": [
+    {
+      "listen": "0.0.0.0:40443",
+      "connect": "CLOUDFLARE_IP:443",
+      "fake_sni": "security.vercel.com"
+    }
+  ]
+}
+```
+
+6. Run with root:
+```bash
+su
+setenforce 0  # Disable SELinux
+./sni-spoof-rs config.json
+```
+
+**Note:** You may need to disable SELinux permanently if it resets after reboot. Edit `/system/build.prop` or use a Magisk module.
 
 ## How it works
 
@@ -279,7 +355,83 @@ sni-spoof-rs.exe config.json
 make all
 ```
 
-این دستور فایل‌های اجرایی برای لینوکس (x64/ARM64)، مک (x64/ARM64) و ویندوز (x64) را در پوشه bins/ می‌سازد. همچنین می‌توانید برای هر پلتفرم جداگانه بیلد بگیرید: make linux-x64، make macos-arm64 و غیره.
+این دستور فایل‌های اجرایی برای لینوکس (x64/ARM64)، مک (x64/ARM64)، ویندوز (x64) و اندروید (ARM64/ARM) را در پوشه bins/ می‌سازد. همچنین می‌توانید برای هر پلتفرم جداگانه بیلد بگیرید: make linux-x64، make macos-arm64، make android-arm64 و غیره.
+
+### بیلد اندروید
+
+فایل‌های اجرایی اندروید می‌تونن با GitHub Actions یا به صورت محلی با Android NDK ساخته بشن:
+
+**استفاده از GitHub Actions (توصیه می‌شه):**
+1. تغییرات رو push کن تا workflow `android-build` اجرا بشه
+2. artifact ها رو از صفحه Actions دانلود کن
+3. به دستگاهت منتقل کن
+
+**بیلد محلی:**
+```bash
+rustup target add aarch64-linux-android armv7-linux-androideabi
+cargo build --release --target aarch64-linux-android  # برای دستگاه‌های ARM64
+cargo build --release --target armv7-linux-androideabi  # برای دستگاه‌های ARM
+```
+
+### راه‌اندازی اندروید با Termux
+
+**نیازمندی‌ها:**
+- دستگاه اندروید روت شده
+- اپلیکیشن Termux (از F-Droid یا GitHub)
+- دسترسی root در Termux (پکیج `tsu`)
+
+**نصب:**
+
+1. Termux رو نصب کن و دسترسی storage بده:
+```bash
+termux-setup-storage
+```
+
+2. پکیج‌های لازم رو نصب کن:
+```bash
+pkg update
+pkg install tsu wget
+```
+
+3. باینری مناسب برای معماری دستگاهت رو دانلود کن:
+```bash
+# معماری دستگاهت رو چک کن
+uname -m
+
+# دانلود ARM64 (بیشتر دستگاه‌های مدرن)
+wget https://github.com/YOUR_USERNAME/sni-spoofing-rust/releases/latest/download/sni-spoof-rs-android-arm64 -O sni-spoof-rs
+
+# یا ARM (دستگاه‌های قدیمی)
+wget https://github.com/YOUR_USERNAME/sni-spoofing-rust/releases/latest/download/sni-spoof-rs-android-arm -O sni-spoof-rs
+```
+
+4. قابل اجرا کن:
+```bash
+chmod +x sni-spoof-rs
+```
+
+5. config.json رو بساز (مثل تنظیمات لینوکس):
+```json
+{
+  "graceful_shutdown_sec": 0,
+  "listeners": [
+    {
+      "listen": "0.0.0.0:40443",
+      "connect": "IP_CLOUDFLARE:443",
+      "fake_sni": "security.vercel.com"
+    }
+  ]
+}
+```
+
+6. با root اجرا کن:
+```bash
+su
+setenforce 0  # غیرفعال کردن SELinux
+./sni-spoof-rs config.json
+```
+
+**نکته:** ممکنه بعد از ریبوت SELinux دوباره فعال بشه. اگه اینطوره، باید دائماً غیرفعالش کنی (ویرایش `/system/build.prop` یا استفاده از Magisk module).
 
 ### دانلود
 
