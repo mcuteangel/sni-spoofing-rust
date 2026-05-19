@@ -38,11 +38,19 @@ jobs:
         with:
           ndk-version: r25c
 
-      - name: Install cargo-ndk
-        run: cargo install cargo-ndk
+      - name: Configure linker
+        run: |
+          mkdir -p ~/.cargo
+          echo "[target.${{ matrix.target }}]" >> ~/.cargo/config.toml
+          echo "ar = \"${{ env.NDK_HOME }}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar\"" >> ~/.cargo/config.toml
+          if [ "${{ matrix.arch }}" = "arm64-v8a" ]; then
+            echo "linker = \"${{ env.NDK_HOME }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-clang\"" >> ~/.cargo/config.toml
+          else
+            echo "linker = \"${{ env.NDK_HOME }}/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi-clang\"" >> ~/.cargo/config.toml
+          fi
 
       - name: Build
-        run: cargo ndk -t ${{ matrix.arch }} --release
+        run: cargo build --release --target ${{ matrix.target }}
 
       - name: Package
         run: |
