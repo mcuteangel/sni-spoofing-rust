@@ -83,12 +83,15 @@ fn run_proxy(config_path: &str) {
     let upstream_sockaddrs: Vec<std::net::SocketAddr> =
         cfg.listeners.iter().map(|lc| lc.connect).collect();
 
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     let backend = match sniffer::linux::AfPacketBackend::open(&upstream_sockaddrs) {
         Ok(b) => b,
         Err(e) => {
             error!("failed to open raw socket: {}", e);
+            #[cfg(target_os = "linux")]
             error!("hint: run with sudo or CAP_NET_RAW");
+            #[cfg(target_os = "android")]
+            error!("hint: run with root or grant CAP_NET_RAW");
             std::process::exit(1);
         }
     };
