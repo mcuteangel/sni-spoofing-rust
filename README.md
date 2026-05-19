@@ -192,17 +192,11 @@ pkg update
 pkg install tsu wget
 ```
 
-3. Download the appropriate binary for your device architecture:
-```bash
-# Check your device architecture
-uname -m
+3. Download the binary for your device architecture:
+- From GitHub Releases: Download `sni-spoof-rs-android-arm64` or `sni-spoof-rs-android-arm` from the [Releases page](https://github.com/mcuteangel/sni-spoofing-rust/releases)
+- Or from GitHub Actions: Run the `android-build` workflow and download the artifacts from the Actions page
 
-# Download ARM64 (most modern devices)
-wget https://github.com/YOUR_USERNAME/sni-spoofing-rust/releases/latest/download/sni-spoof-rs-android-arm64 -O sni-spoof-rs
-
-# Or ARM (older devices)
-wget https://github.com/YOUR_USERNAME/sni-spoofing-rust/releases/latest/download/sni-spoof-rs-android-arm -O sni-spoof-rs
-```
+Transfer the downloaded file to your device using adb, scp, or any file transfer method.
 
 4. Make executable:
 ```bash
@@ -394,16 +388,10 @@ pkg install tsu wget
 ```
 
 3. باینری مناسب برای معماری دستگاهت رو دانلود کن:
-```bash
-# معماری دستگاهت رو چک کن
-uname -m
+- از GitHub Releases: فایل `sni-spoof-rs-android-arm64` یا `sni-spoof-rs-android-arm` رو از [صفحه Releases](https://github.com/mcuteangel/sni-spoofing-rust/releases) دانلود کن
+- یا از GitHub Actions: workflow `android-build` رو اجرا کن و artifact ها رو از صفحه Actions دانلود کن
 
-# دانلود ARM64 (بیشتر دستگاه‌های مدرن)
-wget https://github.com/YOUR_USERNAME/sni-spoofing-rust/releases/latest/download/sni-spoof-rs-android-arm64 -O sni-spoof-rs
-
-# یا ARM (دستگاه‌های قدیمی)
-wget https://github.com/YOUR_USERNAME/sni-spoofing-rust/releases/latest/download/sni-spoof-rs-android-arm -O sni-spoof-rs
-```
+فایل دانلود شده رو با adb، scp یا هر روش دیگه‌ای به دستگاهت منتقل کن.
 
 4. قابل اجرا کن:
 ```bash
