@@ -39,7 +39,7 @@ impl AfPacketBackend {
             libc::bind(
                 fd,
                 &sll as *const libc::sockaddr_ll as *const libc::sockaddr,
-                mem::size_of::<libc::sockaddr_ll>() as u32,
+                mem::size_of::<libc::sockaddr_ll>() as i32,
             )
         };
         if ret < 0 {
@@ -57,7 +57,7 @@ impl AfPacketBackend {
                 libc::SOL_SOCKET,
                 libc::SO_RCVTIMEO,
                 &tv as *const libc::timeval as *const libc::c_void,
-                mem::size_of::<libc::timeval>() as u32,
+                mem::size_of::<libc::timeval>() as i32,
             );
         }
 
@@ -102,7 +102,7 @@ impl RawBackend for AfPacketBackend {
                 frame.len(),
                 0,
                 &sll as *const libc::sockaddr_ll as *const libc::sockaddr,
-                mem::size_of::<libc::sockaddr_ll>() as u32,
+                mem::size_of::<libc::sockaddr_ll>() as i32,
             )
         };
         if ret < 0 {
@@ -185,7 +185,7 @@ fn attach_bpf_filter(fd: RawFd, _upstreams: &[SocketAddr]) -> Result<(), Sniffer
             libc::SOL_SOCKET,
             libc::SO_ATTACH_FILTER,
             &prog as *const libc::sock_fprog as *const libc::c_void,
-            mem::size_of::<libc::sock_fprog>() as u32,
+            mem::size_of::<libc::sock_fprog>() as i32,
         )
     };
     if ret < 0 {
